@@ -1,13 +1,6 @@
 require 'serverspec'
 require 'pathname'
 require 'net/ssh'
-require 'aws-sdk'
-require 'yaml'
-
-#
-config = YAML.load(File.read("#{ENV['HOME'}/path/to/config/deploy/config.yml"))
-AWS.config(config)
-orig = "../template"
 
 include SpecInfra::Helper::Ssh
 include SpecInfra::Helper::DetectOS
@@ -25,10 +18,6 @@ RSpec.configure do |c|
       file = block.to_s.match(/.*@(.*):[0-9]+>/)[1]
     else
       file = block.source_location.first
-    end
-    servers = AWS.ec2.instances.select {|i| i.tags[:Name] == 'hogehuga-kawahara' && i.status == :running}.map(&:dns_name)
-    servers.each do |server|
-      FileUtils.cp("#{orig}",server) unless FileTest.exist?(server)
     end
     host  = File.basename(Pathname.new(file).dirname)
     if c.host != host
